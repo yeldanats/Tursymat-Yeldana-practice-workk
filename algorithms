@@ -1,0 +1,222 @@
+1.def is_balanced_parentheses(input_string):
+    stack = []
+    opening_brackets = "([{"
+    closing_brackets = ")]}"
+
+    for char in input_string:
+        if char in opening_brackets:
+            stack.append(char)
+        elif char in closing_brackets:
+            if not stack:
+                return False  # There is no matching opening bracket
+            top_of_stack = stack.pop()
+            if opening_brackets.index(top_of_stack) != closing_brackets.index(char):
+                return False  # Mismatched brackets
+
+    return not stack  # Stack should be empty if all brackets are balanced
+
+# Example usage:
+input_string = "({[()]})"
+if is_balanced_parentheses(input_string):
+    print("The string is balanced.")
+else:
+    print("The string is unbalanced.")
+
+
+
+2.def evaluate_rpn(expression):
+    stack = []
+
+    operators = set(['+', '-', '*', '/'])
+
+    for token in expression.split():
+        if token not in operators:
+            stack.append(int(token))
+        else:
+            operand2 = stack.pop()
+            operand1 = stack.pop()
+
+            if token == '+':
+                result = operand1 + operand2
+            elif token == '-':
+                result = operand1 - operand2
+            elif token == '*':
+                result = operand1 * operand2
+            elif token == '/':
+                result = operand1 / operand2
+
+            stack.append(result)
+
+    return stack[0]
+
+
+3.class BrowserHistory:
+    def __init__(self):
+        self.opened_stack = []  # Stack for opened pages
+        self.back_stack = []    # Stack for navigating back
+
+    def open_page(self, url):
+        # When opening a new page, clear the back stack
+        self.opened_stack.append(url)
+        self.back_stack = []
+
+    def go_back(self):
+        if len(self.opened_stack) > 1:
+            current_page = self.opened_stack.pop()
+            self.back_stack.append(current_page)
+            return self.opened_stack[-1]
+        else:
+            return None  # Cannot go back further
+
+    def current_page(self):
+        if self.opened_stack:
+            return self.opened_stack[-1]
+        else:
+            return None  # No pages are opened
+
+# Example usage:
+browser = BrowserHistory()
+
+browser.open_page("https://www.example.com/page1")
+browser.open_page("https://www.example.com/page2")
+browser.open_page("https://www.example.com/page3")
+
+print("Current Page:", browser.current_page())  # Output: https://www.example.com/page3
+
+previous_page = browser.go_back()
+if previous_page:
+    print("Previous Page:", previous_page)  # Output: https://www.example.com/page2
+else:
+    print("Cannot go back further.")
+
+previous_page = browser.go_back()
+if previous_page:
+    print("Previous Page:", previous_page)  # Output: https://www.example.com/page1
+else:
+    print("Cannot go back further.")
+
+
+4.def evaluate_expression(expression):
+    def precedence(op):
+        if op in ('+', '-'):
+            return 1
+        if op in ('*', '/'):
+            return 2
+        return 0
+
+    def apply_operator(operators, values):
+        operator = operators.pop()
+        right = values.pop()
+        left = values.pop()
+        if operator == '+':
+            values.append(left + right)
+        elif operator == '-':
+            values.append(left - right)
+        elif operator == '*':
+            values.append(left * right)
+        elif operator == '/':
+            values.append(left / right)
+
+    operators = []
+    values = []
+
+    i = 0
+    while i < len(expression):
+        if expression[i] == ' ':
+            i += 1
+            continue
+        if expression[i] in '0123456789':
+            j = i
+            while j < len(expression) and expression[j] in '0123456789':
+                j += 1
+            values.append(int(expression[i:j]))
+            i = j
+        elif expression[i] in "+-*/":
+            while (operators and operators[-1] in "+-*/" and
+                   precedence(operators[-1]) >= precedence(expression[i])):
+                apply_operator(operators, values)
+            operators.append(expression[i])
+            i += 1
+        elif expression[i] == '(':
+            operators.append(expression[i])
+            i += 1
+        elif expression[i] == ')':
+            while operators[-1] != '(':
+                apply_operator(operators, values)
+            operators.pop()  # Remove the '('
+            i += 1
+        else:
+            # Unknown character
+            raise ValueError("Invalid character in expression")
+
+    while operators:
+        apply_operator(operators, values)
+
+    return values[0]
+
+# Example usage:
+expression = "(2 + 3) * 4"
+result = evaluate_expression(expression)
+print("Result:", result)  # Output: 20
+
+
+
+5.class PriorityQueueUsingStacks:
+    def __init__(self):
+        self.insert_stack = []
+        self.extract_stack = []
+
+    def insert(self, item, priority):
+        # Insert an item with its priority
+        self.insert_stack.append((item, priority))
+
+    def extract_max(self):
+        if not self.extract_stack:
+            self._rebalance_stacks()
+
+        if self.extract_stack:
+            return self.extract_stack.pop()[0]
+        else:
+            return None
+
+    def _rebalance_stacks(self):
+        # Move elements from insert_stack to extract_stack
+        while self.insert_stack:
+            item, priority = self.insert_stack.pop()
+            while self.extract_stack and self.extract_stack[-1][1] < priority:
+                self.insert_stack.append(self.extract_stack.pop())
+            self.extract_stack.append((item, priority))
+
+# Example usage:
+pq = PriorityQueueUsingStacks()
+pq.insert("Task A", 2)
+pq.insert("Task B", 1)
+pq.insert("Task C", 3)
+
+print(pq.extract_max())  # Output: "Task C" (highest priority)
+print(pq.extract_max())  # Output: "Task A"
+print(pq.extract_max())  # Output: "Task B"
+
+
+
+6.def is_palindrome(input_string):
+    input_string = input_string.lower()  # Convert to lowercase for case-insensitive comparison
+    stack = []
+
+    # Push characters from the first half of the string onto the stack
+    for char in input_string[:len(input_string) // 2]:
+        stack.append(char)
+
+    # Compare characters in the second half of the string with the stack
+    for char in input_string[(len(input_string) + 1) // 2:]:
+        if char != stack.pop():
+            return False
+
+    return True
+
+# Example usage:
+input_string = "racecar"
+if is_palindrome(input_string):
+    print(f"{input_string} is a palindrome.")
+else:
+    print(f"{input_string} is not a palindrome.")
